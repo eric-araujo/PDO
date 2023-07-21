@@ -4,10 +4,7 @@ use Alura\Pdo\Domain\Model\Student;
 
 require_once 'vendor/autoload.php';
 
-$dataBasePath = __DIR__ . '/banco.sqlite';
-$pdo = new \PDO(
-    'sqlite:' . $dataBasePath
-);
+$pdo = \Alura\Pdo\Infrastructure\Persistence\ConnectionCreator::create();
 
 $student = new Student(
     null,

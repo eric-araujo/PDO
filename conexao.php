@@ -1,9 +1,6 @@
 <?php
 
-$dataBasePath = __DIR__ . '/banco.sqlite';
-$pdo = new \PDO(
-    'sqlite:' . $dataBasePath
-);
+$pdo = \Alura\Pdo\Infrastructure\Persistence\ConnectionCreator::create();
 
 echo 'Conectado!';
 
