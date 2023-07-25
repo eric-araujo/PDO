@@ -11,22 +11,25 @@ $studentRepository = new StudentRepositoryPDO($connection);
 
 $connection->beginTransaction();
 
-$student = new Student(
-    null,
-    'Rodolfo Nilo',
-    new \DateTimeImmutable('1998-09-20')
-);
+try {
+    $student = new Student(
+        null,
+        'Rodolfo Nilo',
+        new \DateTimeImmutable('1998-09-20')
+    );
 
-$studentRepository->save($student);
+    $studentRepository->save($student);
 
-$student = new Student(
-    null,
-    'Sergio Douglas',
-    new \DateTimeImmutable('1994-10-23')
-);
+    $student = new Student(
+        null,
+        'Sergio Douglas',
+        new \DateTimeImmutable('1994-10-23')
+    );
 
-$studentRepository->save($student);
+    $studentRepository->save($student);
 
-// $connection->rollBack();
-
-$connection->commit();
+    $connection->commit();
+} catch (\PDOException $pdoException) {
+    echo $pdoException->getMessage();
+    $connection->rollBack();
+}
