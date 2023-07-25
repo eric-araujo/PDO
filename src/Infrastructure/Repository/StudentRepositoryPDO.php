@@ -2,6 +2,7 @@
 
 namespace Alura\Pdo\Infrastructure\Repository;
 
+use Alura\Pdo\Domain\Model\Phone;
 use Alura\Pdo\Domain\Model\Student;
 use Alura\Pdo\Domain\Repository\StudentRepositoryInterface;
 use PDO;
@@ -104,5 +105,52 @@ class StudentRepositoryPDO implements StudentRepositoryInterface
         $preparedStatement->bindValue(1, $student->id(), PDO::PARAM_INT);
 
         return $preparedStatement->execute();
+    }
+
+    public function studentsWithPhones(): array
+    {
+        $select = <<<SQL
+            SELECT 
+                students.id,
+                students.name,
+                students.birth_date,
+                phones.id AS phone_id,
+                phones.area_code,
+                phones.number
+            FROM students
+            JOIN phones ON students.id = phones.student_id;
+        SQL;
+
+        $statement = $this->connection->query($select);
+
+        return $this->hydrateStudentWithPhoneList($statement);
+    }
+
+    private function hydrateStudentWithPhoneList(\PDOStatement $pdoStatement): array
+    {
+        $result = $pdoStatement->fetchAll();
+
+        /** @var Student[] $studentList */
+        $studentList = [];
+
+        foreach ($result as $row) {
+            if (!array_key_exists($row['id'], $studentList)) {
+                $studentList[$row['id']] = new Student(
+                    $row['id'],
+                    $row['name'],
+                    new \DateTimeImmutable($row['birth_date'])
+                );
+            }
+
+            $phone = new Phone(
+                $row['phone_id'],
+                $row['area_code'],
+                $row['number']
+            );
+
+            $studentList[$row['id']]->addPhone($phone);
+        }
+
+        return $studentList;
     }
 }
